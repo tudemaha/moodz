@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		9E449EC72DDDB6EE00A4A715 /* moodz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = moodz.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A306ADA2DE6FE3C001721E7 /* moodz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = moodz.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -33,16 +33,8 @@
 			isa = PBXGroup;
 			children = (
 				9E449EC92DDDB6EE00A4A715 /* moodz */,
-				9E449EC82DDDB6EE00A4A715 /* Products */,
+				0A306ADA2DE6FE3C001721E7 /* moodz.app */,
 			);
-			sourceTree = "<group>";
-		};
-		9E449EC82DDDB6EE00A4A715 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				9E449EC72DDDB6EE00A4A715 /* moodz.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -67,7 +59,7 @@
 			packageProductDependencies = (
 			);
 			productName = moodz;
-			productReference = 9E449EC72DDDB6EE00A4A715 /* moodz.app */;
+			productReference = 0A306ADA2DE6FE3C001721E7 /* moodz.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -95,7 +87,7 @@
 			mainGroup = 9E449EBE2DDDB6EE00A4A715;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 9E449EC82DDDB6EE00A4A715 /* Products */;
+			productRefGroup = 9E449EBE2DDDB6EE00A4A715;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
