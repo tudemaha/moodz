@@ -1,4 +1,3 @@
-// MARK: - Models/PromptModel.swift
 import Foundation
 
 struct PromptRequest {
@@ -16,5 +15,18 @@ struct PromptResponse {
     init(text: String) {
         self.text = text
         self.timestamp = Date()
+    }
+}
+
+struct Song: Codable, Identifiable {
+    let id = UUID()
+    let title: String
+    let artist: String
+    let album: String?
+    let year: Int?
+    let genre: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case title, artist, album, year, genre
     }
 }

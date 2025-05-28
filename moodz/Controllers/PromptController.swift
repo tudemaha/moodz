@@ -8,6 +8,7 @@ class PromptController: ObservableObject {
     @Published var response: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published var songs: [Song] = []
  
     private let aiManager: AIManager
     private var cancellables = Set<AnyCancellable>()
@@ -50,6 +51,10 @@ class PromptController: ObservableObject {
             let result = try await aiManager.sendPrompt(request.text)
             let promptResponse = PromptResponse(text: result)
             response = promptResponse.text
+            
+            // Parse songs from the response
+            songs = JSONResponseParser.extractAndParseSongs(from: result)
+            
         } catch {
             errorMessage = handleError(error)
         }

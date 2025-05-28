@@ -12,15 +12,18 @@ struct ContentView: View {
                     isLoading: controller.isLoading
                 )
                 
-                ResponseDisplayView(
-                    response: controller.response,
-                    errorMessage: controller.errorMessage
-                )
+                ScrollView {
+                    ResponseDisplayView(
+                        response: controller.response,
+                        songs: controller.songs,
+                        errorMessage: controller.errorMessage
+                    )
+                }
                 
                 Spacer()
             }
             .padding()
-            .navigationTitle("AI Chat")
+            .navigationTitle("AI Music Chat")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -35,6 +38,8 @@ struct ContentView: View {
 }
 
 // MARK: - Preview
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }

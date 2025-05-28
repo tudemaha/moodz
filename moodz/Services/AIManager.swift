@@ -21,7 +21,7 @@ class AIManager {
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         
         let requestBody: [String: Any] = [
-            "model": "deepseek/deepseek-prover-v2:free", // Adjust model as needed
+            "model": "mistralai/devstral-small:free", // Adjust model as needed
             "messages": [
                 ["role": "user", "content": prompt]
             ],

@@ -2,15 +2,22 @@ import SwiftUI
 
 struct ResponseDisplayView: View {
     let response: String
+    let songs: [Song]
     let errorMessage: String?
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             if let error = errorMessage {
                 ErrorView(message: error)
             }
             
-            if !response.isEmpty {
+            // Show parsed songs if available
+            if !songs.isEmpty {
+                SongsListView(songs: songs)
+            }
+            
+            // Show raw response if no songs or if user wants to see it
+            if !response.isEmpty && songs.isEmpty {
                 ResponseContentView(response: response)
             }
         }
