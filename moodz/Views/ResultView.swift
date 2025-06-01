@@ -63,15 +63,15 @@ struct ResultView: View {
                             isPlayed.toggle()
                         } label: {
                             HStack {
-                                Image(systemName: isPlayed ? "play.fill" : "pause.fill")
-                                Text(isPlayed ? "PLAY" : "PAUSE")
+                                Image(systemName: isPlayed ? "pause.fill" : "play.fill")
+                                Text(isPlayed ? "PAUSE" : "PLAY")
                             }
                             .foregroundStyle(.white)
                             .padding(.vertical, 8)
                             .padding(.horizontal, 15)
-                            .background(.red)
+                            .background(.P)
                             .clipShape(.rect(cornerRadius: 100))
-
+                            
                         }
                     }
                 }
@@ -87,14 +87,27 @@ struct ResultView: View {
                         
                     } label: {
                         Text("Copy to clipboard")
+                            .frame(width: 150)
                             .foregroundStyle(.white)
                             .fontWeight(.bold)
                             .padding(.vertical, 10)
                             .padding(.horizontal, 20)
+                            .background(.P)
+                            .clipShape(.rect(cornerRadius: 100))
                     }
+                    .padding(.bottom, 2)
                     
                     NavigationLink(destination: HomePage()) {
                         Text("Back to home")
+                            .frame(width: 150)
+                            .foregroundStyle(.P)
+                            .fontWeight(.bold)
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 20)
+                            .background(
+                                RoundedRectangle(cornerRadius: 100)
+                                    .stroke(Color.P, lineWidth: 2)
+                            )
                     }
                 }
             }
