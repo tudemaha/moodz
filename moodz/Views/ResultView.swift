@@ -1,15 +1,15 @@
 import SwiftUI
+import MusicKit
 
 struct ResultView: View {
     
-    @State private var isPlayed = false;
-    @State private var selectedIndex: Int? = 0
+    @State private var selectedIndex: MusicItemID?
     @State private var clipboardContent = ""
     @State private var copyButtonText = "Copy to clipboard"
     
-    var songs: [SongItem] = []
+    @StateObject private var musicSearchController = MusicSearchController()
+    @StateObject private var musicPlayerController = MusicPlayerController()
 
-    
     var body: some View {
         ZStack(alignment: .top) {
             Image("Background_Main")
@@ -61,27 +61,39 @@ struct ResultView: View {
                 ScrollViewReader { proxy in
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 10) {
-                            ForEach(0..<5, id: \.self) { index in
+                            ForEach(musicSearchController.results) { song in
                                 HStack(spacing: 10) {
-                                    Image("Background_Black")
-                                        .resizable()
-                                        .frame(width: 100, height: 100)
-                                        .clipShape(.rect(cornerRadius: 10))
+                                    AsyncImage(url: song.artworkURL) { phase in
+                                        if let image = phase.image {
+                                            image
+                                                .resizable()
+                                                .frame(width: 100, height: 100)
+                                                .clipShape(.rect(cornerRadius: 10))
+                                        } else if phase.error != nil {
+                                            Color.red
+                                        } else {
+                                            ProgressView()
+                                        }
+                                    }
                                     
                                     VStack(alignment: .leading) {
-                                        Text("everything u are")
-//                                            .font(.)
+                                        Text(song.title)
                                             .fontWeight(.bold)
                                             .foregroundStyle(.white)
-                                        Text("Hindia")
-//                                            .font(.title3)
+                                        Text(song.artist)
                                             .foregroundStyle(.gray)
                                         Button {
-                                            isPlayed.toggle()
+                                            if song.isPlaying {
+                                                musicPlayerController.pausePreview()
+                                                musicSearchController.updatePausedState(song)
+                                            } else {
+                                                musicPlayerController.playPreview(for: song)
+                                                musicSearchController.updatePlayingState(song)
+                                            }
                                         } label: {
                                             HStack {
-                                                Image(systemName: isPlayed ? "pause.fill" : "play.fill")
-                                                Text(isPlayed ? "PAUSE" : "PLAY")
+                                                Image(systemName: song.isPlaying ? "pause.fill" : "play.fill")
+                                                Text(song.isPlaying ? "PAUSE" : "PLAY")
                                             }
                                             .foregroundStyle(.white)
                                             .padding(.vertical, 5)
@@ -113,11 +125,18 @@ struct ResultView: View {
                     .scrollPosition(id: $selectedIndex)
                 }
                 
+                Button {
+                    musicSearchController.searchTerm = "take me home"
+                    musicSearchController.search()
+                } label: {
+                    Text("search")
+                }
+                
                 Spacer()
                 
                 VStack {
                     Button {
-                        copyToClipboard((String(selectedIndex!)))
+                        copyToClipboard(selectedIndex!)
                     } label: {
                         Text(copyButtonText)
                             .frame(width: 150)
@@ -147,8 +166,10 @@ struct ResultView: View {
         }
     }
     
-    func copyToClipboard(_ text: String) {
-        UIPasteboard.general.string = text
+    func copyToClipboard(_ id: MusicItemID) {
+        let currentSong = musicSearchController.results.first(where: {$0.id == id})
+        
+        UIPasteboard.general.string = "\(currentSong!.artist) - \(currentSong!.title)"
         self.copyButtonText = "Copied!"
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {

@@ -7,4 +7,5 @@ struct SongItem: Identifiable {
     let artist: String
     let artworkURL: URL?
     let previewURL: URL?
+    var isPlaying: Bool = false
 }

@@ -5,7 +5,7 @@ import MusicKit
 class MusicSearchController: ObservableObject {
     @Published var searchTerm = ""
     @Published var results: [SongItem] = []
-
+    
     func search() {
         Task {
             do {
@@ -35,8 +35,25 @@ class MusicSearchController: ObservableObject {
                 print("Search failed: \(error)")
             }
         }
-        
     }
-
+    
+    func updatePlayingState(_ song: SongItem) {
+        results = results.map {
+            SongItem (
+                id: $0.id,
+                title: $0.title,
+                artist: $0.artist,
+                artworkURL: $0.artworkURL,
+                previewURL: $0.previewURL,
+                isPlaying: $0.id == song.id ? true : false
+            )
+        }
+    }
+    
+    func updatePausedState(_ song: SongItem) {
+        let currentIdx = results.firstIndex(where: {$0.id == song.id})
+        results[currentIdx!].isPlaying = false
+    }
+    
 }
 

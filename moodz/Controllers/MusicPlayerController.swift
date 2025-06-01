@@ -1,7 +1,8 @@
 import Foundation
 import AVKit
 
-class MusicPlayerController {
+@MainActor
+class MusicPlayerController: ObservableObject {
     private var player: AVPlayer?
     
     //    used to play audio even in silent mode
@@ -16,6 +17,10 @@ class MusicPlayerController {
         }
         player = AVPlayer(url: url)
         player?.play()
+    }
+    
+    func pausePreview() {
+        player?.pause()
     }
     
     private func configureAudioSession() {

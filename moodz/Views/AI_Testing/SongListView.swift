@@ -28,7 +28,7 @@ struct SongsListView: View {
 }
 
 struct SongCardView: View {
-    let song: Song
+    let song: SongResponse
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
