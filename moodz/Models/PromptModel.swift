@@ -18,7 +18,7 @@ struct PromptResponse {
     }
 }
 
-struct Song: Codable, Identifiable {
+struct SongResponse: Codable, Identifiable {
     let id = UUID()
     let title: String
     let artist: String

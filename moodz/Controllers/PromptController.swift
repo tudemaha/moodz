@@ -8,7 +8,7 @@ class PromptController: ObservableObject {
     @Published var response: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
-    @Published var songs: [Song] = []
+    @Published var songs: [SongResponse] = []
  
     private let aiManager: AIManager
     private var cancellables = Set<AnyCancellable>()

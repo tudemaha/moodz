@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SongsListView: View {
-    let songs: [Song]
+    let songs: [SongResponse]
     
     var body: some View {
         if songs.isEmpty {

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ResponseDisplayView: View {
     let response: String
-    let songs: [Song]
+    let songs: [SongResponse]
     let errorMessage: String?
     
     var body: some View {
