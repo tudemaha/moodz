@@ -18,15 +18,13 @@ struct PromptResponse {
     }
 }
 
-struct Song: Codable, Identifiable {
+struct SongResponse: Codable, Identifiable {
     let id = UUID()
     let title: String
     let artist: String
-    let album: String?
-    let year: Int?
-    let genre: String?
     
     enum CodingKeys: String, CodingKey {
-        case title, artist, album, year, genre
+        case title, artist
     }
 }
+

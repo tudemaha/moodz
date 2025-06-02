@@ -4,7 +4,7 @@ import Combine
 
 @MainActor
 class PromptController: ObservableObject {
-    @Published var prompt: String = ""
+    @Published var prompt: String = "Give me 5 Songs about love, return it only in json format"
     @Published var response: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?

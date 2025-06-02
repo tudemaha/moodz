@@ -11,7 +11,7 @@ import SwiftUI
 struct moodzApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MusicSearchView()
         }
     }
 }

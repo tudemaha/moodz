@@ -1,15 +1,19 @@
 import SwiftUI
 
 struct PromptInputView: View {
-    @Binding var prompt: String
+    // Fixed prompt text that cannot be changed
+    let promptText = "Give me 5 Songs about love, return it only in json format"
     let onSend: () -> Void
     let isLoading: Bool
     
     var body: some View {
         VStack(spacing: 16) {
-            TextField("Enter your prompt", text: $prompt)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .disabled(isLoading)
+            // Display the fixed prompt text in a read-only field
+            Text(promptText)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color(UIColor.systemGray6))
+                .cornerRadius(8)
             
             Button(action: onSend) {
                 HStack {
@@ -24,7 +28,7 @@ struct PromptInputView: View {
                 .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-            .disabled(isLoading || prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            .disabled(isLoading)
         }
     }
 }

@@ -31,7 +31,7 @@ struct ErrorView: View {
         HStack {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundColor(.red)
-            Text(message)
+            Text("test : \(message)")
                 .foregroundColor(.red)
                 .font(.caption)
         }

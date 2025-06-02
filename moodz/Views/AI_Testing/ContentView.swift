@@ -2,12 +2,12 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var controller = PromptController()
+    @StateObject private var viewModel = MusicSearchViewModel()
     
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
                 PromptInputView(
-                    prompt: $controller.prompt,
                     onSend: controller.sendPrompt,
                     isLoading: controller.isLoading
                 )
@@ -18,6 +18,19 @@ struct ContentView: View {
                         songs: controller.songs,
                         errorMessage: controller.errorMessage
                     )
+//                    List(controller.songs){song in 
+//                        if viewModel.isSearching {
+//                            ProgressView()
+//                        } else {
+//                            SongRowView(
+//                                song: song,
+//                                isPlaying: viewModel.currentlyPlayingSong == song
+//                            ) {
+//                                viewModel.togglePlayback(for: song)
+//                            }
+//                        }
+//                    }
+//                    
                 }
                 
                 Spacer()

@@ -45,36 +45,36 @@ struct SongCardView: View {
                 
                 Spacer()
                 
-                if let year = song.year {
-                    Text("\(year)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.secondary.opacity(0.2))
-                        .cornerRadius(8)
-                }
+//                if let year = song.year {
+//                    Text("\(year)")
+//                        .font(.caption)
+//                        .foregroundColor(.secondary)
+//                        .padding(.horizontal, 8)
+//                        .padding(.vertical, 4)
+//                        .background(Color.secondary.opacity(0.2))
+//                        .cornerRadius(8)
+//                }
             }
             
-            HStack {
-                if let album = song.album {
-                    Label(album, systemImage: "opticaldisc")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                if let genre = song.genre {
-                    Text(genre)
-                        .font(.caption)
-                        .foregroundColor(.blue)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.blue.opacity(0.1))
-                        .cornerRadius(4)
-                }
-            }
+//            HStack {
+//                if let album = song.album {
+//                    Label(album, systemImage: "opticaldisc")
+//                        .font(.caption)
+//                        .foregroundColor(.secondary)
+//                }
+//                
+//                Spacer()
+//                
+//                if let genre = song.genre {
+//                    Text(genre)
+//                        .font(.caption)
+//                        .foregroundColor(.blue)
+//                        .padding(.horizontal, 6)
+//                        .padding(.vertical, 2)
+//                        .background(Color.blue.opacity(0.1))
+//                        .cornerRadius(4)
+//                }
+//            }
         }
         .padding()
         .background(Color.secondary.opacity(0.05))
