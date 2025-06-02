@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SongsListView: View {
-    let songs: [Song]
+    let songs: [SongResponse]
     
     var body: some View {
         if songs.isEmpty {
@@ -28,7 +28,7 @@ struct SongsListView: View {
 }
 
 struct SongCardView: View {
-    let song: Song
+    let song: SongResponse
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {

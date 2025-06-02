@@ -1,6 +1,6 @@
 import Foundation
 class JSONResponseParser {
-    static func extractAndParseSongs(from aiResponse: String) -> [Song] {
+    static func extractAndParseSongs(from aiResponse: String) -> [SongResponse] {
         guard let jsonString = extractJSONFromResponse(aiResponse) else {
             print("No JSON found in response")
             return []
@@ -27,14 +27,14 @@ class JSONResponseParser {
         return nil
     }
     
-    private static func parseSongsFromJSON(_ jsonString: String) -> [Song] {
+    private static func parseSongsFromJSON(_ jsonString: String) -> [SongResponse] {
         guard let data = jsonString.data(using: .utf8) else {
             print("Failed to convert JSON string to data")
             return []
         }
         
         do {
-            let songs = try JSONDecoder().decode([Song].self, from: data)
+            let songs = try JSONDecoder().decode([SongResponse].self, from: data)
             return songs
         } catch {
             print("JSON parsing error: \(error)")
@@ -42,7 +42,7 @@ class JSONResponseParser {
             let fixedJSON = fixCommonJSONIssues(jsonString)
             if let fixedData = fixedJSON.data(using: .utf8) {
                 do {
-                    let songs = try JSONDecoder().decode([Song].self, from: fixedData)
+                    let songs = try JSONDecoder().decode([SongResponse].self, from: fixedData)
                     return songs
                 } catch {
                     print("Even fixed JSON failed: \(error)")
