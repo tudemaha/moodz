@@ -1,17 +1,21 @@
-
 import Foundation
 import Combine
+import MusicKit
+import AVFoundation
 
 @MainActor
 class PromptController: ObservableObject {
-    @Published var prompt: String = "Give me 5 Songs about love, return it only in json format"
+    @Published var prompt: String = "Given the detected vibes of the photo happy and location at beach, generate a list of 5 song recommendations. Your response MUST be ONLY a valid JSON array containing exactly 5 objects. Each object in the array must have two string properties: 'title' and 'artist'. Do not include any explanations, introductory text, or any characters outside of this JSON array. Example of an object: {\"title\": \"Song Title\", \"artist\": \"Artist Name\""
     @Published var response: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
-    @Published var songs: [Song] = []
+    @Published var songs: [AISongResponse] = []
+    @Published var songItems: [SongItem] = []
  
     private let aiManager: AIManager
     private var cancellables = Set<AnyCancellable>()
+    private var player: AVPlayer?
+    private var playerItem: AVPlayerItem?
     
     init(aiManager: AIManager = AIManager(apiKey: Config.deepSeekAPIKey)) {
         self.aiManager = aiManager
@@ -42,6 +46,22 @@ class PromptController: ObservableObject {
         errorMessage = nil
     }
     
+    func togglePlayback(for song: SongItem) {
+        // Find the song in the array
+        if let index = songItems.firstIndex(where: { $0.id == song.id }) {
+            // If this song is already playing, stop it
+            if songItems[index].isPlaying {
+                stopPlayback()
+            } else {
+                // Stop any currently playing song
+                stopPlayback()
+                
+                // Start playing this song
+                playPreview(for: index)
+            }
+        }
+    }
+    
     // MARK: - Private Methods
     private func performPromptRequest(_ request: PromptRequest) async {
         isLoading = true
@@ -55,11 +75,67 @@ class PromptController: ObservableObject {
             // Parse songs from the response
             songs = JSONResponseParser.extractAndParseSongs(from: result)
             
+            // Search for these songs in Apple Music
+            await searchSongsInAppleMusic()
+            
         } catch {
             errorMessage = handleError(error)
         }
         
         isLoading = false
+    }
+    
+    private func searchSongsInAppleMusic() async {
+        var items: [SongItem] = []
+        
+        print("Searching for \(songs.count) songs in Apple Music")
+        
+        for song in songs {
+            do {
+                print("Searching for: \(song.title) by \(song.artist)")
+                
+                // Check authorization status
+                let status = await MusicAuthorization.request()
+                guard status == .authorized else {
+                    print("MusicKit not authorized")
+                    continue
+                }
+                
+                // Search for the song in Apple Music
+                let searchTerm = "\(song.title) \(song.artist)"
+                var request = MusicCatalogSearchRequest(term: searchTerm, types: [MusicKit.Song.self])
+                request.limit = 1
+                
+                let response = try await request.response()
+                
+                if let firstSong = response.songs.first {
+                    print("Found match: \(firstSong.title) by \(firstSong.artistName)")
+                    
+                    let songItem = SongItem(
+                        id: firstSong.id,
+                        title: firstSong.title,
+                        artist: firstSong.artistName,
+                        artworkURL: firstSong.artwork?.url(width: 200, height: 200),
+                        previewURL: firstSong.previewAssets?.first?.url,
+                        isPlaying: false
+                    )
+                    
+                    // Print debug info about artwork and preview
+                    print("Artwork URL: \(String(describing: songItem.artworkURL))")
+                    print("Preview URL: \(String(describing: songItem.previewURL))")
+                    
+                    items.append(songItem)
+                } else {
+                    print("No matches found in Apple Music")
+                }
+            } catch {
+                print("Failed to search for song: \(song.title) - \(error)")
+            }
+        }
+        
+        // Update the songItems property
+        print("Found \(items.count) matches in Apple Music")
+        songItems = items
     }
     
     private func handleError(_ error: Error) -> String {
@@ -77,5 +153,68 @@ class PromptController: ObservableObject {
         } else {
             return "An error occurred: \(errorDescription)"
         }
+    }
+    
+    private func playPreview(for index: Int) {
+        guard index < songItems.count, let url = songItems[index].previewURL else {
+            return
+        }
+        
+        // Update isPlaying state
+        for i in 0..<songItems.count {
+            songItems[i].isPlaying = (i == index)
+        }
+        
+        // Create and play audio
+        playerItem = AVPlayerItem(url: url)
+        player = AVPlayer(playerItem: playerItem)
+        
+        // Add observer for playback end
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(playerDidFinishPlaying),
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: playerItem
+        )
+        
+        player?.play()
+    }
+    
+    private func stopPlayback() {
+        // Reset isPlaying state for all songs
+        for i in 0..<songItems.count {
+            songItems[i].isPlaying = false
+        }
+        
+        // Stop playback
+        player?.pause()
+        if let playerItem = playerItem {
+            NotificationCenter.default.removeObserver(
+                self,
+                name: .AVPlayerItemDidPlayToEndTime,
+                object: playerItem
+            )
+        }
+        player?.replaceCurrentItem(with: nil)
+        playerItem = nil
+    }
+    
+    @objc private func playerDidFinishPlaying() {
+        Task { @MainActor in
+            stopPlayback()
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+        
+        // Fix: Use Task to call stopPlayback() on the main actor
+        Task { @MainActor [weak self] in
+            // Use weak self to avoid retain cycles
+            self?.stopPlayback()
+        }
+        
+        // We can still clean up cancellables synchronously
+        cancellables.removeAll()
     }
 }

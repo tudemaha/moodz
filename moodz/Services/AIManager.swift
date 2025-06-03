@@ -21,7 +21,7 @@ class AIManager {
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         
         let requestBody: [String: Any] = [
-            "model": "mistralai/devstral-small:free", // Adjust model as needed
+            "model": "google/gemma-3n-e4b-it:free", // Adjust model as needed
             "messages": [
                 ["role": "user", "content": prompt]
             ],

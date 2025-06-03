@@ -9,9 +9,10 @@ import SwiftUI
 
 @main
 struct moodzApp: App {
+    @StateObject private var promptController = PromptController()
     var body: some Scene {
         WindowGroup {
-            MusicSearchView()
+            OnBoardingView()
         }
     }
 }
