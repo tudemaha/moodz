@@ -2,12 +2,15 @@ import SwiftUI
 
 struct PreviewPage: View {
     var selectedImage: UIImage? // Image passed from ContentView
+    //var backgroundImage: UIImage?
     @State private var rotationAngle: Angle = .zero
     @State private var imageSize: CGSize = CGSize(width: 300, height: 600)
-    
+    @State private var shouldHide = false
     @State private var selectedMood: String = "Melancholy"
     @State private var place = ""
+    @State private var mood = ""
     @State private var navigateToResults = false
+    @State private var addMood = false
     
     // Create a computed property for the prompt based on mood and place
     private var generatedPrompt: String {
@@ -36,22 +39,38 @@ struct PreviewPage: View {
         ]
         
         ZStack(alignment: .top){
-            Image("Background_Black")
+            if let selectedImage = selectedImage {
+                Image(uiImage: selectedImage) // Set UIImage as background
+                    .resizable()
+                    .scaledToFit()
+                    .blur(radius: 10)
+                    .scaleEffect(1.3)
+                    .opacity(70)
+                    .rotationEffect(rotationAngle) // Apply rotation based on orientation
+                    .containerRelativeFrame(.vertical) {
+                        height,
+                        _ in height * 1
+                    }
+                    .onAppear {
+                        // Detect orientation when the image appears
+                        detectOrientation(for: selectedImage)
+                    }
+            } else {
+                Rectangle()
+                    .foregroundColor(Color.accentColorDark)
+                    .scaledToFill()
+            }
+           
             
             VStack{
                 HStack(alignment: .top){
-                    NavigationLink(destination: HomePage()) {
+                    NavigationLink(destination: UploadScreen()) {
                         Image("back_arrow")
                             .font(.largeTitle)
                             .foregroundColor(.white)
                     }.padding()
                     Spacer()
                     
-                    Image("logo_W").resizable()
-                        .scaledToFit()
-                        .frame(width: 120, height: 80)
-                    
-                    Spacer()
                     
                     RoundedRectangle(cornerRadius: 25)
                         .fill(Color.white)
@@ -114,27 +133,80 @@ struct PreviewPage: View {
                                 }
                             }
                         }
+                        
+                        Button {
+                            // Add new, customized mood
+                            addMood = true
+                            selectedMood = ""
+                            self.shouldHide = true
+                        }
+                        label: {
+                            Text("Add Mood")
+                                .font(.custom("HelveticaNeue", size: 16))
+                                .fontWeight(.semibold)
+                                .foregroundColor(.black)
+                                .containerRelativeFrame(.horizontal) { width, _ in
+                                    width * 0.6
+                                }
+                                .padding(12)
+                                .background(Color.white)
+                                .clipShape(.capsule)
+                            
+                            }.opacity(shouldHide ? 0 : 1)
+                        
+                        
+                        if (addMood == true) {
+                            HStack{
+                                TextField("Describe Mood", text: $mood)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .disableAutocorrection(true)
+                                    .background(.white)
+                                    .font(.custom("HelveticaNeue", size: 16))
+                                    .clipShape(.capsule)
+                                    .padding(.top, -35)
+                                
+                                /*Button {
+                                    
+                                } label: {
+                                    Text("Add")
+                                        .font(.custom("HelveticaNeue", size: 16))
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.black)
+                                    
+                                        .padding(12)
+                                        .background(Color.white)
+                                        .clipShape(.capsule)
+                                }
+                                 */
+                            }.containerRelativeFrame(.horizontal) { width, _ in
+                                width * 0.6
+                            }
+                            
+                        }
+                            
                     }
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 10)
                     
                     VStack {
                         HStack(spacing: 10) {
-                            Text("Show the place: ")
+                            /*Text("Show the place: ")
                                 .font(.custom("HelveticaNeue", size: 18))
                                 .foregroundStyle(.white)
                                 .fontWeight(.semibold)
+                             */
                             
                             Spacer()
                         }
                         
-                        TextField("Place", text: $place)
+                        /*TextField("Place", text: $place)
                             .frame(height: 35).border(Color.P)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .disableAutocorrection(true)
                             .background(.white)
                             .font(.custom("HelveticaNeue", size: 16))
                             .clipShape(.capsule)
+                         */
                         
                     }
                     .padding(.horizontal, 20)

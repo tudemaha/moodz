@@ -12,7 +12,7 @@ struct moodzApp: App {
     @StateObject private var promptController = PromptController()
     var body: some Scene {
         WindowGroup {
-            OnBoardingView()
+            LandingPage()
         }
     }
 }

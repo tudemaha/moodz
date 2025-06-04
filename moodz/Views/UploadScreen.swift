@@ -10,10 +10,11 @@ import _PhotosUI_SwiftUI
 
 struct UploadScreen: View {
     @Environment(\.presentationMode) var presentationMode
-    @State private var selectedItem: PhotosPickerItem?  // To store the selected photo item
+    @State private var pickerItem: PhotosPickerItem?  // To store the selected photo item
+    @State private var isPickerPresented = false // State variable to manage when to present the photo picker
+    
     @State private var selectedUIImage: UIImage? = nil  // Store UIImage for further processing
     @State private var selectedImage: Image?  // SwiftUI Image to display the selected image
-
     @State private var isNavigating = false  // State to control navigation to Preview
 
     var body: some View {
@@ -40,20 +41,22 @@ struct UploadScreen: View {
 
                 ZStack {
                     Rectangle()
-                        .containerRelativeFrame(.horizontal) { height, _ in
-                            height * 0.9
-                        }
-                        .padding(.bottom, 100)
                         .foregroundStyle(.white)
                         .cornerRadius(40)
                         .shadow(radius: 10)
+                        .containerRelativeFrame(.horizontal) { height, _ in
+                            height * 0.9
+                        }
+                        .containerRelativeFrame(.vertical) { width, _ in
+                            width * 0.8
+                        }
 
                     Spacer()
                         .containerRelativeFrame(.vertical) { height, _ in
                             height * 0.1
                         }
 
-                    PhotosPicker(selection: $selectedItem) {
+                    //PhotosPicker(selection: $selectedItem) {
                         VStack {
                             Spacer().frame(height: 100)
                             ZStack {
@@ -90,25 +93,34 @@ struct UploadScreen: View {
                                 )
                                 .foregroundColor(.accentColorDark)
 
-                        }.background(
-                            NavigationLink(
-                                destination: PreviewPage(
-                                    selectedImage: selectedUIImage
-                                ),
-                                isActive: $isNavigating
-                            ) {
-                                EmptyView()
-                            }
-                        )
+                        }.onTapGesture {
+                            isPickerPresented = true
+                        }
+
+                    //}
+                }
+        }
+            .photosPicker(isPresented: $isPickerPresented, selection: $pickerItem, matching: .images)
+            .onChange(of: pickerItem) { newItem in
+                Task {
+                    if let data = try? await newItem?.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data) {
+                        selectedUIImage = uiImage
+                        selectedImage = Image(uiImage: uiImage)
+                        isNavigating = true
                     }
                 }
             }
-            .ignoresSafeArea()
-        }.background(.accentColorDark, )
-            .toolbarVisibility(Visibility.hidden)
-            .ignoresSafeArea()
-            .navigationViewStyle(StackNavigationViewStyle())
+            .background(
+                NavigationLink(destination: PreviewPage(selectedImage: selectedUIImage), isActive: $isNavigating) {
+                    EmptyView()
+                }
+            )
 
+        }.ignoresSafeArea()
+            .background(.accentColorDark)
+                .toolbarVisibility(Visibility.hidden)
+                .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
