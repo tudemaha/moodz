@@ -28,7 +28,7 @@ struct PreviewPage: View {
     }
     
     var body: some View {
-        let moods = ["Chill", "Melancholy", "Confident", "Romantic", "Energetic", "Dreamy"]
+        let moods = ["Chill", "Melancholic", "Confident", "Romantic", "Energetic", "Dreamy"]
         let moodLayout = [
             GridItem(.adaptive(minimum: 90)),
             GridItem(.adaptive(minimum: 90)),
@@ -87,7 +87,7 @@ struct PreviewPage: View {
                 VStack{
                     VStack(spacing: 10) {
                         HStack {
-                            Text("Select current mood of the image: ")
+                            Text("Describe the mood of the image: ")
                                 .font(.custom("HelveticaNeue", size: 18))
                                 .foregroundStyle(.white)
                                 .fontWeight(.semibold)

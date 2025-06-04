@@ -9,51 +9,54 @@
 import SwiftUI
 
 struct LandingPage: View {
-    
     var body: some View {
-        ZStack {
-            NavigationStack{
-                GeometryReader { geometry in
+        NavigationStack{
+        ZStack (alignment: .top){
                     Image(.backgroundFoto)
                         .resizable()
+                        .scaledToFill()
                         .ignoresSafeArea()
-                    
+                        .containerRelativeFrame(.vertical) {height, _ in height * 1}
+                        
                     
                     VStack(alignment: .center) {
-                        Spacer().frame(height: geometry.size.height * 0.55)
+                        Spacer().containerRelativeFrame(.vertical) { height, _ in height * 0.55
+                        }
                         Text("Match")
-                            .font(.system(size: 16, weight: .medium, design: .default))
-                            .foregroundColor(Color.white)
-                        
+                            .font(.custom("HelveticaNeue", size: 16))
+                            .foregroundColor(.white)
+                            .tracking(5)
+                    
                         Image(.moodzLogo)
                             .resizable()
                             .frame(width: 200, height: 60)
                         Spacer()
                             .frame(height: 10)
                         Text("Music")
-                            .font(.system(size: 16, weight: .medium, design: .default))
-                            .foregroundColor(Color.white)
-                        
-                        Spacer().frame(height: geometry.size.height * 0.15)
-                        
+                            .font(.custom("HelveticaNeue", size: 16))
+                            .foregroundColor(.white)
+                            .tracking(5)
+                    
+                        Spacer().containerRelativeFrame(.vertical) {height, _ in height * 0.15}
                         
                         NavigationLink(destination: UploadScreen())
                         {
                             Text("Get Started")
-                                .font(.system(size: 20, weight: .bold, design: .default))
-                                .foregroundColor(Color.white)
-                                .frame(width: geometry.size.width * 0.8, height: geometry.size.height * 0.05, alignment: .center)
+                                .font(.custom("HelveticaNeue", size: 20)).bold()
+                                .foregroundColor(.white)
+                                .containerRelativeFrame(.horizontal, alignment: .center) { width, _ in width * 0.8 }
+                                .padding(.vertical, 10)
                                 .background(Color.accentColorLight)
                                 .cornerRadius(25)
                         }
                         
                         
-                    }.padding(geometry.size.width * 0.1)
-                }.ignoresSafeArea()
+                    }
+                }
             }
         }
     }
-}
+
 
 #Preview {
     LandingPage()
