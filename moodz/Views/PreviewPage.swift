@@ -22,7 +22,7 @@ struct PreviewPage: View {
         }
         
         // Complete the prompt
-        prompt += ", generate a list of 5 song recommendations. Your response MUST be ONLY a valid JSON array containing exactly 5 objects. Each object in the array must have two string properties: 'title' and 'artist'. Do not include any explanations, introductory text, or any characters outside of this JSON array."
+        prompt += ", generate a list of 5 viral song recommendations. Your response MUST be ONLY a valid JSON array containing exactly 5 objects. Each object in the array must have two string properties: 'title' and 'artist'. Do not include any explanations, introductory text, or any characters outside of this JSON array."
         
         return prompt
     }

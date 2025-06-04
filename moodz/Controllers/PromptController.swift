@@ -5,7 +5,7 @@ import AVFoundation
 
 @MainActor
 class PromptController: ObservableObject {
-    @Published var prompt: String = "Given the detected vibes of the photo happy and location at beach, generate a list of 5 song recommendations. Your response MUST be ONLY a valid JSON array containing exactly 5 objects. Each object in the array must have two string properties: 'title' and 'artist'. Do not include any explanations, introductory text, or any characters outside of this JSON array. Example of an object: {\"title\": \"Song Title\", \"artist\": \"Artist Name\""
+    @Published var prompt: String = ""
     @Published var response: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?

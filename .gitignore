@@ -131,4 +131,15 @@ iOSInjectionProject/
 /*.gcno
 **/xcshareddata/WorkspaceSettings.xcsettings
 
+# API Keys and Sensitive Information
+AI_API_Key.plist
+**/Resources/AI_API_Key.plist
+moodz/Resources/AI_API_Key.plist
+
+# Apple Music Developer Token
+token.p8
+*.p8
+**/Resources/token.p8
+moodz/Resources/token.p8
+
 # End of https://www.toptal.com/developers/gitignore/api/swift,xcode,macos

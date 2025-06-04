@@ -88,8 +88,8 @@ struct ResultView: View {
                         loadingView
                     } else if !promptController.songItems.isEmpty {
                         songListView
-                    } else {
-                        emptyStateView
+                    } else if !promptController.isLoading{
+                        loadingView
                     }
                     
                     // Search button (only shown when not loading)

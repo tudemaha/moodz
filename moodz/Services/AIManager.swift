@@ -2,7 +2,7 @@ import Foundation
 
 class AIManager {
     private let apiKey : String
-    private let baseURL = "https://openrouter.ai/api/v1" // Replace with actual API endpoint
+    private let baseURL = "https://api.openai.com/v1"
     
     init(apiKey: String) {
         self.apiKey = apiKey
@@ -21,7 +21,7 @@ class AIManager {
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         
         let requestBody: [String: Any] = [
-            "model": "google/gemma-3n-e4b-it:free", // Adjust model as needed
+            "model": "gpt-4.1-nano", // Adjust model as needed
             "messages": [
                 ["role": "user", "content": prompt]
             ],
@@ -50,7 +50,7 @@ class AIManager {
 }
 struct Config {
     static var deepSeekAPIKey: String {
-        guard let path = Bundle.main.path(forResource: "AI_API_Key", ofType: "plist"),
+        guard let path = Bundle.main.path(forResource: "API_Key", ofType: "plist"),
               let dict = NSDictionary(contentsOfFile: path),
               let key = dict["api_key"] as? String else {
             fatalError("API Key not found in Key.plist or invalid format")
