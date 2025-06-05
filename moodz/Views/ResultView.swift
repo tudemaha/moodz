@@ -36,30 +36,24 @@ struct ResultView: View {
             // Main content
             VStack(spacing: 0) {
                 // Header - fixed to properly center the logo
-                ZStack {
-                    HStack {
-                        NavigationLink(destination: PreviewPage(selectedImage: backgroundImage)) {
-                            Image("back_arrow")
-                                .font(.largeTitle)
-                                .foregroundColor(.white)
-                        }
-                        
-                        Spacer()
-                        
-                        // Empty space to balance the back button
-                        Rectangle()
-                            .opacity(0)
-                            .frame(width: 40, height: 40)
+                //                ZStack {
+                HStack {
+                    NavigationLink(destination: PreviewPage(selectedImage: backgroundImage)) {
+                        Image("back_arrow")
+                            .font(.largeTitle)
+                            .foregroundColor(.white)
                     }
                     
-                    // Centered logo
+                    Spacer()
+                    
                     Image("logo_W")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 120, height: 80)
+                    
+                    Spacer(minLength: 142)
                 }
-                .padding(.horizontal)
-                .padding(.top, 60)
+                .padding(.leading, 10)
                 
                 // Content area with proper spacing
                 VStack(spacing: 20) {
@@ -67,23 +61,24 @@ struct ResultView: View {
                     if let backgroundImage = backgroundImage {
                         Image(uiImage: backgroundImage)
                             .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(maxWidth: UIScreen.main.bounds.width * 0.6)
+                            .scaledToFit()
+                            .containerRelativeFrame(.vertical) { height, _ in
+                                height * 0.35
+                            }
                             .clipShape(.rect(cornerRadius: 20))
                             .padding(.top, 20)
                     } else {
                         Image("Background_Black")
                             .resizable()
                             .scaledToFit()
-                            .frame(maxWidth: UIScreen.main.bounds.width * 0.6)
+                            .containerRelativeFrame(.vertical) { height, _ in
+                                height * 0.35
+                            }
                             .clipShape(.rect(cornerRadius: 20))
                             .padding(.top, 20)
                     }
                     
-                    Spacer()
-                        .frame(height: 20)
-                    
-                    // Song list or loading indicator - with fixed height and proper containment
+
                     if promptController.isLoading {
                         loadingView
                     } else if !promptController.songItems.isEmpty {
@@ -113,40 +108,41 @@ struct ResultView: View {
                         .padding(.vertical)
                     }
                     
-                    Spacer()
                     
                     // Bottom buttons
-                    VStack(spacing: 12) {
-                        Button {
-                            if let id = selectedIndex {
-                                copyToClipboard(id)
+                    if !promptController.isLoading {
+                        VStack(spacing: 12) {
+                            Button {
+                                if let id = selectedIndex {
+                                    copyToClipboard(id)
+                                }
+                            } label: {
+                                Text(copyButtonText)
+                                    .frame(width: 150)
+                                    .foregroundStyle(.white)
+                                    .fontWeight(.bold)
+                                    .padding(.vertical, 10)
+                                    .padding(.horizontal, 20)
+                                    .background(.P)
+                                    .clipShape(.rect(cornerRadius: 100))
                             }
-                        } label: {
-                            Text(copyButtonText)
-                                .frame(width: 150)
-                                .foregroundStyle(.white)
-                                .fontWeight(.bold)
-                                .padding(.vertical, 10)
-                                .padding(.horizontal, 20)
-                                .background(.P)
-                                .clipShape(.rect(cornerRadius: 100))
+                            .disabled(selectedIndex == nil)
+                            
+                            NavigationLink(destination: HomePage()) {
+                                Text("Back to home")
+                                    .frame(width: 150)
+                                    .foregroundStyle(.P)
+                                    .fontWeight(.bold)
+                                    .padding(.vertical, 10)
+                                    .padding(.horizontal, 20)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 100)
+                                            .stroke(Color.P, lineWidth: 2)
+                                    )
+                            }
                         }
-                        .disabled(selectedIndex == nil)
-                        
-                        NavigationLink(destination: HomePage()) {
-                            Text("Back to home")
-                                .frame(width: 150)
-                                .foregroundStyle(.P)
-                                .fontWeight(.bold)
-                                .padding(.vertical, 10)
-                                .padding(.horizontal, 20)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 100)
-                                        .stroke(Color.P, lineWidth: 2)
-                                )
-                        }
+                        .padding(.bottom, 30)
                     }
-                    .padding(.bottom, 30)
                 }
                 .padding(.horizontal)
             }
