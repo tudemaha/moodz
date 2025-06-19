@@ -13,10 +13,6 @@ struct ResultView: View {
     
     // MARK: - Initialization (Updated with Dependency Injection)
     init(customPrompt: String? = nil, SelectedImage: UIImage? = nil, promptController: PromptController) {
-        print("🔧 ResultView INIT - customPrompt: \(customPrompt ?? "nil")")
-        print("🔧 ResultView INIT - promptController with \(promptController.songItems.count) songs")
-        print("🔧 PromptController instance: \(ObjectIdentifier(promptController))")
-        
         self._controller = StateObject(wrappedValue: ResultPageController(
             customPrompt: customPrompt,
             selectedImage: SelectedImage,
@@ -51,11 +47,13 @@ struct ResultView: View {
                     }
                 }
                 .onAppear {
-                    print("🔄 ResultView onAppear - controller.songItems: \(controller.songItems.count)")
                     controller.viewDidAppear()
                     
                     // Check if remaining generations is 0 and show alert
                     checkAndShowLimitAlert()
+                }
+                .onDisappear {
+                    controller.stopAllPlayingSongs()
                 }
             }
             .navigationBarBackButtonHidden(true)
@@ -69,7 +67,10 @@ struct ResultView: View {
                 Image("back_arrow")
                     .font(.largeTitle)
                     .foregroundColor(.white)
-            }.padding()
+            }.simultaneousGesture(TapGesture().onEnded {
+                controller.stopAllPlayingSongs()
+            })
+            .padding()
             Spacer()
             
             Image("logo_W").resizable()
@@ -198,7 +199,7 @@ struct ResultView: View {
                         )
                 }
                 .simultaneousGesture(TapGesture().onEnded {
-                    controller.navigateBackWithAudioStop()
+                    controller.stopAllPlayingSongs()
                 })
             }
             Spacer().frame(height: 50)

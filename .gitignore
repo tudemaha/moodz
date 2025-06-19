@@ -136,4 +136,9 @@ API_Key.plist
 **/Resources/API_Key.plist
 moodz/Resources/API_Key.plist
 
+# Configuration files with API keys
+Config.xcconfig
+moodz/Config.xcconfig
+**/Config.xcconfig
+
 # End of https://www.toptal.com/developers/gitignore/api/swift,xcode,macos

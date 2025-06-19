@@ -11,21 +11,53 @@ class UserPreferencesManager {
         static let songGenerationCount = "songGenerationCount"
         static let lastGenerationDate = "lastGenerationDate"
         static let dailyGenerationLimit = 5
+        static let appInstallationDate = "appInstallationDate"
+        static let onboardingVersion = "onboardingVersion"
     }
+    
+    private let currentOnboardingVersion = 1
     
     // MARK: - OnBoarding Management
     var hasCompletedOnboarding: Bool {
         get {
-            UserDefaults.standard.bool(forKey: Keys.hasCompletedOnboarding)
+            let completed = UserDefaults.standard.bool(forKey: Keys.hasCompletedOnboarding)
+            let savedVersion = UserDefaults.standard.integer(forKey: Keys.onboardingVersion)
+            
+            return completed && savedVersion == currentOnboardingVersion
         }
         set {
             UserDefaults.standard.set(newValue, forKey: Keys.hasCompletedOnboarding)
+            if newValue {
+                UserDefaults.standard.set(currentOnboardingVersion, forKey: Keys.onboardingVersion)
+            }
         }
     }
     
     func completeOnboarding() {
         hasCompletedOnboarding = true
-        print("✅ Onboarding completed and saved")
+        
+        if UserDefaults.standard.object(forKey: Keys.appInstallationDate) == nil {
+            UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: Keys.appInstallationDate)
+        }
+    }
+    
+    var isFreshInstall: Bool {
+        return UserDefaults.standard.object(forKey: Keys.appInstallationDate) == nil
+    }
+    
+    var daysSinceInstallation: Int {
+        guard let installTimestamp = UserDefaults.standard.object(forKey: Keys.appInstallationDate) as? TimeInterval else {
+            return 0
+        }
+        
+        let installDate = Date(timeIntervalSince1970: installTimestamp)
+        let daysSince = Calendar.current.dateComponents([.day], from: installDate, to: Date()).day ?? 0
+        return daysSince
+    }
+    
+    func resetOnboardingForUser() {
+        UserDefaults.standard.removeObject(forKey: Keys.hasCompletedOnboarding)
+        UserDefaults.standard.removeObject(forKey: Keys.onboardingVersion)
     }
     
     // MARK: - Song Generation Limit Management
@@ -39,7 +71,6 @@ class UserPreferencesManager {
     }
     
     var todaysGenerationCount: Int {
-        // Check if it's a new day
         if !isToday(lastGenerationDate) {
             resetDailyCount()
             return 0
@@ -65,7 +96,6 @@ class UserPreferencesManager {
     
     func incrementGenerationCount() -> Bool {
         guard canGenerateToday() else {
-            print("❌ Daily generation limit reached")
             return false
         }
         
@@ -73,13 +103,11 @@ class UserPreferencesManager {
         UserDefaults.standard.set(currentCount + 1, forKey: Keys.songGenerationCount)
         lastGenerationDate = Date()
         
-        print("✅ Generation count incremented. Remaining: \(remainingGenerations)")
         return true
     }
     
     private func resetDailyCount() {
         UserDefaults.standard.set(0, forKey: Keys.songGenerationCount)
-        print("🔄 Daily generation count reset")
     }
     
     private func isToday(_ date: Date?) -> Bool {
@@ -87,46 +115,28 @@ class UserPreferencesManager {
         return Calendar.current.isDate(date, inSameDayAs: Date())
     }
     
-    // MARK: - Debug/Developer Methods
+    // MARK: - Debug/Developer Methods (Only for development)
+    #if DEBUG
     func resetAllData() {
         UserDefaults.standard.removeObject(forKey: Keys.hasCompletedOnboarding)
         UserDefaults.standard.removeObject(forKey: Keys.songGenerationCount)
         UserDefaults.standard.removeObject(forKey: Keys.lastGenerationDate)
-        print("🔄 All user preferences reset")
+        UserDefaults.standard.removeObject(forKey: Keys.appInstallationDate)
+        UserDefaults.standard.removeObject(forKey: Keys.onboardingVersion)
     }
     
-    /// Reset only the daily generation count (for testing)
-    func resetDailyGenerations() {
-        UserDefaults.standard.set(0, forKey: Keys.songGenerationCount)
-        lastGenerationDate = nil
-        print("🔄 Daily generation count reset to 0. You now have \(remainingGenerations)/\(dailyGenerationLimit) attempts")
-    }
-    
-    /// Set generation count to maximum (for testing limit scenario)
-    func setGenerationsToMax() {
-        UserDefaults.standard.set(dailyGenerationLimit, forKey: Keys.songGenerationCount)
-        lastGenerationDate = Date()
-        print("🔄 Generation count set to maximum. You now have \(remainingGenerations)/\(dailyGenerationLimit) attempts")
-    }
-    
-    /// Set a specific generation count (for testing)
-    func setGenerationCount(_ count: Int) {
-        let clampedCount = max(0, min(count, dailyGenerationLimit))
-        UserDefaults.standard.set(clampedCount, forKey: Keys.songGenerationCount)
-        lastGenerationDate = Date()
-        print("🔄 Generation count set to \(clampedCount). You now have \(remainingGenerations)/\(dailyGenerationLimit) attempts")
-    }
-    
-    /// Reset onboarding only (for testing onboarding flow)
     func resetOnboarding() {
         UserDefaults.standard.removeObject(forKey: Keys.hasCompletedOnboarding)
-        print("🔄 Onboarding reset. Will show onboarding on next app launch")
+        UserDefaults.standard.removeObject(forKey: Keys.onboardingVersion)
     }
+    #endif
     
     func getDebugInfo() -> String {
         return """
         📊 User Preferences Debug:
         - Onboarding completed: \(hasCompletedOnboarding)
+        - Fresh install: \(isFreshInstall)
+        - Days since install: \(daysSinceInstallation)
         - Today's generations: \(todaysGenerationCount)/\(dailyGenerationLimit)
         - Remaining generations: \(remainingGenerations)
         - Last generation: \(lastGenerationDate?.formatted() ?? "Never")

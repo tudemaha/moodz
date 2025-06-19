@@ -38,12 +38,7 @@ struct SongCardView: View {
             }
         }
         .onAppear {
-            print("Song: \(song.title) by \(song.artist)")
-            if let match = findMatchingSongItem() {
-                print("Found match: \(match.title) by \(match.artist)")
-            } else {
-                print("No match found in Apple Music")
-            }
+            // Removed print statements for performance
         }
     }
     
@@ -54,7 +49,7 @@ struct SongCardView: View {
             if let songItem = findMatchingSongItem() {
                 promptController.togglePlayback(for: songItem)
             } else {
-                print("No matching song found in Apple Music")
+                // Silently handle case where no matching song is found
             }
         } label: {
             HStack {

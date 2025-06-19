@@ -29,7 +29,8 @@ class PromptController: ObservableObject {
     
     // MARK: - Developer Methods (only in DEBUG)
     #if DEBUG
-    func sendPromptWithoutLimitCheck() {
+    /// Developer-only method to send prompts without consuming daily limit
+    func sendPromptDeveloperMode() {
         let promptRequest = PromptRequest(text: prompt)
         
         guard promptRequest.isValid else {
@@ -38,8 +39,6 @@ class PromptController: ObservableObject {
             }
             return
         }
-        
-        print("🔧 Developer mode: Sending prompt without daily limit check")
         
         Task {
             await performPromptRequestWithoutLimitCheck(promptRequest)
@@ -71,7 +70,6 @@ class PromptController: ObservableObject {
             await searchSongsInAppleMusic()
             
             // ✅ Skip incrementing generation count for developer mode
-            print("🔧 Developer mode: Song generation completed without affecting daily limit")
             
         } catch {
             await MainActor.run {
@@ -140,7 +138,6 @@ class PromptController: ObservableObject {
     private func showLimitReachedAlert() {
         limitAlertMessage = "Daily limit reached! You can generate \(UserPreferencesManager.shared.dailyGenerationLimit) songs per day. Try again tomorrow!"
         showLimitAlert = true
-        print("🚫 Daily generation limit reached")
     }
     
     private func updateRemainingGenerations() {
@@ -177,7 +174,6 @@ class PromptController: ObservableObject {
                 if success {
                     await MainActor.run {
                         updateRemainingGenerations()
-                        print("✅ Generation successful. Remaining: \(remainingGenerations)")
                     }
                 }
             }
@@ -196,19 +192,8 @@ class PromptController: ObservableObject {
     private func searchSongsInAppleMusic() async {
         var items: [SongItem] = []
         
-        print("Searching for \(songs.count) songs in Apple Music")
-        
         for song in songs {
             do {
-                print("Searching for: \(song.title) by \(song.artist)")
-                
-                // Check authorization status
-                let status = await MusicAuthorization.request()
-                guard status == .authorized else {
-                    print("MusicKit not authorized")
-                    continue
-                }
-                
                 // Search for the song in Apple Music
                 let searchTerm = "\(song.title) \(song.artist)"
                 var request = MusicCatalogSearchRequest(term: searchTerm, types: [MusicKit.Song.self])
@@ -217,8 +202,6 @@ class PromptController: ObservableObject {
                 let response = try await request.response()
                 
                 if let firstSong = response.songs.first {
-                    print("Found match: \(firstSong.title) by \(firstSong.artistName)")
-                    
                     let songItem = SongItem(
                         id: firstSong.id,
                         title: firstSong.title,
@@ -228,22 +211,15 @@ class PromptController: ObservableObject {
                         isPlaying: false
                     )
                     
-                    print("Artwork URL: \(String(describing: songItem.artworkURL))")
-                    print("Preview URL: \(String(describing: songItem.previewURL))")
-                    
                     items.append(songItem)
-                    print("🎵 items array now: \(items)")
-                } else {
-                    print("No matches found in Apple Music")
                 }
             } catch {
-                print("Failed to search for song: \(song.title) - \(error)")
+                // Handle error silently
             }
         }
         
         // Update the songItems property on main actor
         await MainActor.run {
-            print("Found \(items.count) matches in Apple Music")
             songItems = items
         }
     }
@@ -295,8 +271,10 @@ class PromptController: ObservableObject {
             songItems[i].isPlaying = false
         }
         
-        // Stop playback
+        // Stop playback immediately
         player?.pause()
+        
+        // Clean up observers
         if let playerItem = playerItem {
             NotificationCenter.default.removeObserver(
                 self,
@@ -304,7 +282,10 @@ class PromptController: ObservableObject {
                 object: playerItem
             )
         }
+        
+        // ✅ IMPROVED: More thorough cleanup
         player?.replaceCurrentItem(with: nil)
+        player = nil
         playerItem = nil
     }
     

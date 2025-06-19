@@ -119,11 +119,10 @@ class AIManager {
 
 struct Config {
     static var openAIAPIKey: String {
-        guard let path = Bundle.main.path(forResource: "API_Key", ofType: "plist"),
-              let dict = NSDictionary(contentsOfFile: path),
-              let key = dict["api_key"] as? String else {
-            fatalError("OpenAI API Key not found in API_Key.plist or invalid format")
+        guard let apiKey = Bundle.main.object(forInfoDictionaryKey: "OPENAI_API_KEY") as? String,
+              !apiKey.isEmpty else {
+            fatalError("OpenAI API Key not found in build configuration. Make sure Config.xcconfig is properly set up.")
         }
-        return key
+        return apiKey
     }
 }

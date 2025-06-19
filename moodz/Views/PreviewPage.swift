@@ -189,16 +189,12 @@ struct PreviewPage: View {
     
     // MARK: - Button Action Handler
     private func handleGenerateButtonTap() {
-        print("🔘 Generate button tapped. Remaining generations: \(promptController.remainingGenerations)")
-        
         // Check if user has remaining generations
         if promptController.remainingGenerations > 0 {
             // User can generate, proceed normally
-            print("✅ User has remaining generations, proceeding with generation")
             controller.generateSongs()
         } else {
             // User has no remaining generations, show alert
-            print("❌ User has no remaining generations, showing alert")
             showLimitAlert = true
         }
     }

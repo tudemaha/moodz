@@ -109,11 +109,7 @@ class HomePageController: ObservableObject {
                 image: uiImage
             )
             
-            print("✅ ML Analysis - Human: \(result.isHuman)")
-            print("✅ ML Analysis - Place: \(result.place)")
-            
         } catch {
-            print("❌ Error analyzing image: \(error.localizedDescription)")
             await setError(error.localizedDescription)
             
             // Set default values in case of error

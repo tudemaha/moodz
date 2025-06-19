@@ -13,9 +13,6 @@ struct moodzApp: App {
     
     var body: some Scene {
         WindowGroup {
-            // ✅ ADD THIS LINE TO RESET DAILY GENERATIONS
-//            let _ = UserPreferencesManager.shared.resetAllData()
-            
             // Check if onboarding is needed
             if UserPreferencesManager.shared.hasCompletedOnboarding {
                 // Skip onboarding, go directly to HomePage

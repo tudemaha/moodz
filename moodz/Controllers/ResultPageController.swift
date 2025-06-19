@@ -54,9 +54,6 @@ class ResultPageController: ObservableObject {
         
         // Set up reactive bindings to promptController
         setupBindings()
-        
-        print("🔧 ResultPageController INIT - Injected promptController with \(promptController.songItems.count) songs")
-        print("🔧 PromptController instance: \(ObjectIdentifier(promptController))")
     }
     
     // MARK: - Reactive Bindings Setup
@@ -78,16 +75,10 @@ class ResultPageController: ObservableObject {
             .receive(on: DispatchQueue.main)
             .assign(to: \.errorMessage, on: self)
             .store(in: &cancellables)
-        
-        print("🔄 ResultPageController - Reactive bindings set up")
     }
     
     // MARK: - Lifecycle Methods
     func viewDidAppear() {
-        print("🔍 ResultPageController viewDidAppear - songItems: \(songItems.count)")
-        print("🔍 PromptController songItems: \(promptController.songItems.count)")
-        print("🔍 PromptController instance: \(ObjectIdentifier(promptController))")
-        
         // Auto-start song generation if needed
         if songItems.isEmpty && !isLoading {
             if let customPrompt = customPrompt {
@@ -132,7 +123,6 @@ class ResultPageController: ObservableObject {
             // ✅ Create prompt with current songs excluded
             let modifiedPrompt = createPromptWithExclusions(from: customPrompt)
             promptController.prompt = modifiedPrompt
-            print("🎲 Modified prompt with exclusions: \(modifiedPrompt)")
         }
         promptController.sendPrompt()
     }
