@@ -284,10 +284,13 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = moodz/Info.plist;
-				INFOPLIST_KEY_NSAppleMusicUsageDescription = "This app needs access to Apple Music to play music preview and search for songs.";
+				INFOPLIST_KEY_CFBundleDisplayName = Moodz;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Preview and save recommended songs to your Apple Music library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Moodz analyzes your photos to recommend music that matches the mood and setting.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -316,10 +319,13 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = moodz/Info.plist;
-				INFOPLIST_KEY_NSAppleMusicUsageDescription = "This app needs access to Apple Music to play music preview and search for songs.";
+				INFOPLIST_KEY_CFBundleDisplayName = Moodz;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Preview and save recommended songs to your Apple Music library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Moodz analyzes your photos to recommend music that matches the mood and setting.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
