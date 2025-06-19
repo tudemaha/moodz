@@ -11,22 +11,96 @@ class PromptController: ObservableObject {
     @Published var errorMessage: String?
     @Published var songs: [AISongResponse] = []
     @Published var songItems: [SongItem] = []
+    
+    // MARK: - Generation Limit Properties
+    @Published var remainingGenerations: Int = UserPreferencesManager.shared.remainingGenerations
+    @Published var showLimitAlert: Bool = false
+    @Published var limitAlertMessage: String = ""
  
     private let aiManager: AIManager
     private var cancellables = Set<AnyCancellable>()
     private var player: AVPlayer?
     private var playerItem: AVPlayerItem?
     
-    init(aiManager: AIManager = AIManager(apiKey: Config.deepSeekAPIKey)) {
+    init(aiManager: AIManager = AIManager(apiKey: Config.openAIAPIKey)) {
         self.aiManager = aiManager
+        updateRemainingGenerations()
     }
+    
+    // MARK: - Developer Methods (only in DEBUG)
+    #if DEBUG
+    func sendPromptWithoutLimitCheck() {
+        let promptRequest = PromptRequest(text: prompt)
+        
+        guard promptRequest.isValid else {
+            Task { @MainActor in
+                errorMessage = "Please enter a valid prompt"
+            }
+            return
+        }
+        
+        print("🔧 Developer mode: Sending prompt without daily limit check")
+        
+        Task {
+            await performPromptRequestWithoutLimitCheck(promptRequest)
+        }
+    }
+    
+    private func performPromptRequestWithoutLimitCheck(_ request: PromptRequest) async {
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+        }
+        
+        do {
+            let result = try await aiManager.sendPrompt(request.text)
+            let promptResponse = PromptResponse(text: result)
+            
+            await MainActor.run {
+                response = promptResponse.text
+            }
+            
+            // Parse songs from the response
+            let parsedSongs = JSONResponseParser.extractAndParseSongs(from: result)
+            
+            await MainActor.run {
+                songs = parsedSongs
+            }
+            
+            // Search for these songs in Apple Music
+            await searchSongsInAppleMusic()
+            
+            // ✅ Skip incrementing generation count for developer mode
+            print("🔧 Developer mode: Song generation completed without affecting daily limit")
+            
+        } catch {
+            await MainActor.run {
+                errorMessage = handleError(error)
+            }
+        }
+        
+        await MainActor.run {
+            isLoading = false
+        }
+    }
+    #endif
     
     // MARK: - Public Methods
     func sendPrompt() {
         let promptRequest = PromptRequest(text: prompt)
         
         guard promptRequest.isValid else {
-            errorMessage = "Please enter a valid prompt"
+            Task { @MainActor in
+                errorMessage = "Please enter a valid prompt"
+            }
+            return
+        }
+        
+        // Check generation limit
+        guard UserPreferencesManager.shared.canGenerateToday() else {
+            Task { @MainActor in
+                showLimitReachedAlert()
+            }
             return
         }
         
@@ -63,26 +137,60 @@ class PromptController: ObservableObject {
     }
     
     // MARK: - Private Methods
+    private func showLimitReachedAlert() {
+        limitAlertMessage = "Daily limit reached! You can generate \(UserPreferencesManager.shared.dailyGenerationLimit) songs per day. Try again tomorrow!"
+        showLimitAlert = true
+        print("🚫 Daily generation limit reached")
+    }
+    
+    private func updateRemainingGenerations() {
+        remainingGenerations = UserPreferencesManager.shared.remainingGenerations
+    }
+    
     private func performPromptRequest(_ request: PromptRequest) async {
-        isLoading = true
-        errorMessage = nil
+        await MainActor.run {
+            isLoading = true
+            errorMessage = nil
+        }
         
         do {
             let result = try await aiManager.sendPrompt(request.text)
             let promptResponse = PromptResponse(text: result)
-            response = promptResponse.text
+            
+            await MainActor.run {
+                response = promptResponse.text
+            }
             
             // Parse songs from the response
-            songs = JSONResponseParser.extractAndParseSongs(from: result)
+            let parsedSongs = JSONResponseParser.extractAndParseSongs(from: result)
+            
+            await MainActor.run {
+                songs = parsedSongs
+            }
             
             // Search for these songs in Apple Music
             await searchSongsInAppleMusic()
             
+            // Increment generation count only on successful generation
+            if !songs.isEmpty {
+                let success = UserPreferencesManager.shared.incrementGenerationCount()
+                if success {
+                    await MainActor.run {
+                        updateRemainingGenerations()
+                        print("✅ Generation successful. Remaining: \(remainingGenerations)")
+                    }
+                }
+            }
+            
         } catch {
-            errorMessage = handleError(error)
+            await MainActor.run {
+                errorMessage = handleError(error)
+            }
         }
         
-        isLoading = false
+        await MainActor.run {
+            isLoading = false
+        }
     }
     
     private func searchSongsInAppleMusic() async {
@@ -120,11 +228,11 @@ class PromptController: ObservableObject {
                         isPlaying: false
                     )
                     
-                    // Print debug info about artwork and preview
                     print("Artwork URL: \(String(describing: songItem.artworkURL))")
                     print("Preview URL: \(String(describing: songItem.previewURL))")
                     
                     items.append(songItem)
+                    print("🎵 items array now: \(items)")
                 } else {
                     print("No matches found in Apple Music")
                 }
@@ -133,19 +241,20 @@ class PromptController: ObservableObject {
             }
         }
         
-        // Update the songItems property
-        print("Found \(items.count) matches in Apple Music")
-        songItems = items
+        // Update the songItems property on main actor
+        await MainActor.run {
+            print("Found \(items.count) matches in Apple Music")
+            songItems = items
+        }
     }
     
     private func handleError(_ error: Error) -> String {
-        // Add specific error handling logic here
         let errorDescription = error.localizedDescription
         
         if errorDescription.contains("Invalid URL") {
             return "Configuration error. Please check the API settings."
         } else if errorDescription.contains("API Request Failed") {
-            return "API request failed. Please check your API key and try again."
+            return "API request failed. Please check your OpenAI API key and try again."
         } else if errorDescription.contains("Invalid Response Format") {
             return "Received invalid response from the server."
         } else if errorDescription.contains("network") || errorDescription.contains("Internet") {
@@ -180,7 +289,7 @@ class PromptController: ObservableObject {
         player?.play()
     }
     
-    private func stopPlayback() {
+    func stopPlayback() {
         // Reset isPlaying state for all songs
         for i in 0..<songItems.count {
             songItems[i].isPlaying = false
@@ -208,13 +317,10 @@ class PromptController: ObservableObject {
     deinit {
         NotificationCenter.default.removeObserver(self)
         
-        // Fix: Use Task to call stopPlayback() on the main actor
         Task { @MainActor [weak self] in
-            // Use weak self to avoid retain cycles
             self?.stopPlayback()
         }
         
-        // We can still clean up cancellables synchronously
         cancellables.removeAll()
     }
 }

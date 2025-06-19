@@ -2,166 +2,236 @@ import SwiftUI
 import MusicKit
 
 struct ResultView: View {
-    @State private var selectedIndex: MusicItemID?
-    @State private var copyButtonText = "Copy to clipboard"
-    @StateObject private var promptController = PromptController()
+    // MARK: - Controller
+    @StateObject private var controller: ResultPageController
     
-    // Add these properties to accept parameters
-    var customPrompt: String?
-    var backgroundImage: UIImage?
+    // MARK: - Local State for Alerts
+    @State private var showLimitAlert = false
+    
+    // MARK: - Environment Object (for accessing remaining generations)
+    @EnvironmentObject var promptController: PromptController
+    
+    // MARK: - Initialization (Updated with Dependency Injection)
+    init(customPrompt: String? = nil, SelectedImage: UIImage? = nil, promptController: PromptController) {
+        print("🔧 ResultView INIT - customPrompt: \(customPrompt ?? "nil")")
+        print("🔧 ResultView INIT - promptController with \(promptController.songItems.count) songs")
+        print("🔧 PromptController instance: \(ObjectIdentifier(promptController))")
+        
+        self._controller = StateObject(wrappedValue: ResultPageController(
+            customPrompt: customPrompt,
+            selectedImage: SelectedImage,
+            promptController: promptController
+        ))
+    }
     
     var body: some View {
-        ZStack(alignment: .top) {
-            // Background - use passed image if available
-            if let backgroundImage = backgroundImage {
-                Image(uiImage: backgroundImage)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .blur(radius: 20)
-                    .overlay(Color.black.opacity(0.6))
-                    .ignoresSafeArea()
-            } else {
-                Image("Background_Main")
-                    .resizable()
-                    .ignoresSafeArea()
-            }
+        ZStack(alignment: .top){
+            Image("Background_Black")
+                .resizable()
+                .ignoresSafeArea()
             
-            LinearGradient(
-                gradient: Gradient(colors: [.black.opacity(0.5), .black.opacity(0)]),
-                startPoint: .bottom,
-                endPoint: .top
-            )
-            .ignoresSafeArea()
-            
-            // Main content
-            VStack(spacing: 0) {
-                // Header - fixed to properly center the logo
-                ZStack {
-                    HStack {
-                        NavigationLink(destination: PreviewPage(selectedImage: backgroundImage)) {
-                            Image("back_arrow")
-                                .font(.largeTitle)
-                                .foregroundColor(.white)
-                        }
-                        
-                        Spacer()
-                        
-                        // Empty space to balance the back button
-                        Rectangle()
-                            .opacity(0)
-                            .frame(width: 40, height: 40)
-                    }
-                    
-                    // Centered logo
-                    Image("logo_W")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 120, height: 80)
-                }
-                .padding(.horizontal)
-                .padding(.top, 60)
+            VStack{
+                headerSection
                 
-                // Content area with proper spacing
-                VStack(spacing: 20) {
-                    // Image display
-                    if let backgroundImage = backgroundImage {
-                        Image(uiImage: backgroundImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(maxWidth: UIScreen.main.bounds.width * 0.6)
-                            .clipShape(.rect(cornerRadius: 20))
-                            .padding(.top, 20)
-                    } else {
-                        Image("Background_Black")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(maxWidth: UIScreen.main.bounds.width * 0.6)
-                            .clipShape(.rect(cornerRadius: 20))
-                            .padding(.top, 20)
-                    }
-                    
-                    Spacer()
-                        .frame(height: 20)
-                    
-                    // Song list or loading indicator - with fixed height and proper containment
-                    if promptController.isLoading {
-                        loadingView
-                    } else if !promptController.songItems.isEmpty {
-                        songListView
-                    } else if !promptController.isLoading{
-                        loadingView
-                    }
-                    
-                    // Search button (only shown when not loading)
-                    if !promptController.isLoading {
-                        Button {
-                            // If custom prompt is provided, use it
-                            if let customPrompt = customPrompt {
-                                promptController.prompt = customPrompt
-                            }
-                            promptController.sendPrompt()
-                        } label: {
-                            Text("Generate Songs")
-                                .frame(width: 200)
-                                .foregroundStyle(.white)
-                                .fontWeight(.bold)
-                                .padding(.vertical, 10)
-                                .padding(.horizontal, 20)
-                                .background(.P)
-                                .clipShape(.rect(cornerRadius: 100))
-                        }
-                        .padding(.vertical)
-                    }
-                    
-                    Spacer()
-                    
-                    // Bottom buttons
-                    VStack(spacing: 12) {
-                        Button {
-                            if let id = selectedIndex {
-                                copyToClipboard(id)
-                            }
-                        } label: {
-                            Text(copyButtonText)
-                                .frame(width: 150)
-                                .foregroundStyle(.white)
-                                .fontWeight(.bold)
-                                .padding(.vertical, 10)
-                                .padding(.horizontal, 20)
-                                .background(.P)
-                                .clipShape(.rect(cornerRadius: 100))
-                        }
-                        .disabled(selectedIndex == nil)
+                Spacer()
+                    .frame(height: 30)
+                
+                ScrollView {
+                    VStack{
+                        imageSection
                         
-                        NavigationLink(destination: HomePage()) {
-                            Text("Back to home")
-                                .frame(width: 150)
-                                .foregroundStyle(.P)
-                                .fontWeight(.bold)
-                                .padding(.vertical, 10)
-                                .padding(.horizontal, 20)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 100)
-                                        .stroke(Color.P, lineWidth: 2)
-                                )
+                        // ✅ ADD: Remaining generations display
+                        remainingGenerationsSection
+                        
+                        contentSection
+                        
+                        if !controller.isLoading {
+                            actionButtonsSection
                         }
                     }
-                    .padding(.bottom, 30)
                 }
-                .padding(.horizontal)
+                .onAppear {
+                    print("🔄 ResultView onAppear - controller.songItems: \(controller.songItems.count)")
+                    controller.viewDidAppear()
+                    
+                    // Check if remaining generations is 0 and show alert
+                    checkAndShowLimitAlert()
+                }
+            }
+            .navigationBarBackButtonHidden(true)
+        }
+    }
+    
+    // MARK: - View Components
+    private var headerSection: some View {
+        HStack(alignment: .top){
+            NavigationLink(destination: HomePage()) {
+                Image("back_arrow")
+                    .font(.largeTitle)
+                    .foregroundColor(.white)
+            }.padding()
+            Spacer()
+            
+            Image("logo_W").resizable()
+                .scaledToFit()
+                .frame(width: 120, height: 80)
+            
+            Spacer()
+            
+            RoundedRectangle(cornerRadius: 25)
+                .fill(Color.white)
+                .frame(width : 80, height: 30)
+                .opacity(0)
+        }
+    }
+    
+    private var imageSection: some View {
+        Group {
+            if let imageInfo = controller.imageDisplayInfo {
+                Image(uiImage: imageInfo.image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: imageInfo.size.width, height: imageInfo.size.height)
+                    .rotationEffect(Angle(degrees: imageInfo.rotationAngle))
+            } else {
+                Text("No image selected")
+                    .foregroundColor(.white)
             }
         }
-        .onAppear {
-            // If there are no songs yet, automatically start the search
-            if promptController.songItems.isEmpty && !promptController.isLoading {
-                // If custom prompt is provided, use it
-                if let customPrompt = customPrompt {
-                    promptController.prompt = customPrompt
-                }
-                promptController.sendPrompt()
+    }
+    
+    // ✅ NEW: Remaining generations display section
+    private var remainingGenerationsSection: some View {
+        VStack(spacing: 8) {
+            HStack {
+                Image(systemName: controller.remainingGenerations > 0 ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                    .foregroundColor(controller.remainingGenerations > 0 ? .green : .orange)
+                
+                Text("Daily generations remaining: \(controller.remainingGenerations)/\(UserPreferencesManager.shared.dailyGenerationLimit)")
+                    .font(.custom("HelveticaNeue", size: 14))
+                    .foregroundColor(.white)
+                    .fontWeight(.medium)
+            }
+            
+            // Show warning message when generations are low
+            if controller.remainingGenerations <= 1 && controller.remainingGenerations > 0 {
+                Text("⚠️ Only \(controller.remainingGenerations) generation left today!")
+                    .font(.custom("HelveticaNeue", size: 12))
+                    .foregroundColor(.orange)
+                    .italic()
+            } else if controller.remainingGenerations == 0 {
+                Text("❌ No more generations today. Come back tomorrow!")
+                    .font(.custom("HelveticaNeue", size: 12))
+                    .foregroundColor(.red)
+                    .fontWeight(.semibold)
             }
         }
-        .navigationBarBackButtonHidden(true)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.white.opacity(0.1))
+                .stroke(controller.remainingGenerations > 0 ? Color.green.opacity(0.3) : Color.orange.opacity(0.5), lineWidth: 1)
+        )
+        .padding(.horizontal, 20)
+    }
+    
+    private var contentSection: some View {
+        Group {
+            if controller.isLoading {
+                loadingView
+            } else if controller.hasSongs {
+                songListView
+            } else {
+                emptyStateView
+            }
+        }
+    }
+    
+    private var actionButtonsSection: some View {
+        VStack {
+            Button {
+                if let id = controller.selectedIndex {
+                    controller.copyToClipboard(id)
+                }
+            } label: {
+                Text(controller.copyButtonState.text)
+                    .frame(width: 200)
+                    .foregroundStyle(.white)
+                    .fontWeight(.bold)
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 20)
+                    .background(.P)
+                    .clipShape(.rect(cornerRadius: 100))
+            }
+            .padding(.vertical)
+            
+            VStack(spacing: 12) {
+                // ✅ UPDATED: Generate Other Songs button with limit checking
+                Button {
+                    handleGenerateOtherSongs()
+                } label: {
+                    Text("Generate Other Songs")
+                        .frame(width: 200)
+                        .foregroundStyle(.white)
+                        .fontWeight(.bold)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 20)
+                        .background(controller.remainingGenerations > 0 ? .P : .gray)
+                        .clipShape(.rect(cornerRadius: 100))
+                }
+                .disabled(controller.selectedIndex == nil)
+                .simultaneousGesture(TapGesture().onEnded {
+                    controller.stopAllPlayingSongs()
+                })
+                
+                NavigationLink(destination: HomePage()) {
+                    Text("Back to home")
+                        .frame(width: 150)
+                        .foregroundStyle(.P)
+                        .fontWeight(.bold)
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 20)
+                        .background(
+                            RoundedRectangle(cornerRadius: 100)
+                                .stroke(Color.P, lineWidth: 2)
+                        )
+                }
+                .simultaneousGesture(TapGesture().onEnded {
+                    controller.navigateBackWithAudioStop()
+                })
+            }
+            Spacer().frame(height: 50)
+        }
+        .alert("Daily Limit Reached", isPresented: $showLimitAlert) {
+            Button("OK") {
+                showLimitAlert = false
+            }
+        } message: {
+            Text("You've used all \(UserPreferencesManager.shared.dailyGenerationLimit) daily generations. Your limit will reset tomorrow at midnight.")
+        }
+    }
+    
+    // MARK: - Action Handlers
+    private func handleGenerateOtherSongs() {
+        print("🔘 Generate Other Songs tapped. Remaining: \(controller.remainingGenerations)")
+        
+        if controller.remainingGenerations > 0 {
+            // User has remaining generations
+            controller.generateOtherSongs()
+        } else {
+            // User has no remaining generations, show alert
+            showLimitAlert = true
+        }
+    }
+    
+    private func checkAndShowLimitAlert() {
+        // Show alert if user has 0 remaining generations when view appears
+        if controller.remainingGenerations == 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                showLimitAlert = true
+            }
+        }
     }
     
     // Loading view shown when generating songs
@@ -180,12 +250,12 @@ struct ResultView: View {
         .frame(height: 150)
     }
     
-    // Song list view when songs are available - fixed to contain cards properly
+    // Song list view when songs are available
     private var songListView: some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
-                    ForEach(promptController.songItems) { songItem in
+                    ForEach(controller.songItems) { songItem in
                         songCard(for: songItem)
                             .frame(width: UIScreen.main.bounds.width * 0.8)
                             .padding(15)
@@ -202,7 +272,7 @@ struct ResultView: View {
                 .padding(.horizontal, 20)
             }
             .scrollTargetBehavior(.viewAligned)
-            .scrollPosition(id: $selectedIndex)
+            .scrollPosition(id: $controller.selectedIndex)
             .frame(height: 150)
         }
     }
@@ -214,19 +284,24 @@ struct ResultView: View {
                 .font(.system(size: 50))
                 .foregroundColor(.white.opacity(0.7))
             
-            Text("Tap 'Generate Songs' to get music recommendations")
+            Text("No songs generated yet")
                 .font(.headline)
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
-                .padding()
+            
+            Text("Songs will appear here automatically")
+                .font(.subheadline)
+                .foregroundColor(.white.opacity(0.7))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
         }
         .frame(height: 150)
     }
     
-    // Individual song card - fixed layout to fit properly
+    // Individual song card
     private func songCard(for songItem: SongItem) -> some View {
         HStack(spacing: 10) {
-            // Song artwork - fixed size
+            // Song artwork
             if let artworkURL = songItem.artworkURL {
                 AsyncImage(url: artworkURL) { phase in
                     if let image = phase.image {
@@ -246,7 +321,7 @@ struct ResultView: View {
                 defaultArtwork
             }
             
-            // Song details and play button - with proper spacing
+            // Song details and play button
             VStack(alignment: .leading, spacing: 5) {
                 Text(songItem.title)
                     .fontWeight(.bold)
@@ -258,7 +333,7 @@ struct ResultView: View {
                     .lineLimit(1)
                 
                 Button {
-                    promptController.togglePlayback(for: songItem)
+                    controller.togglePlayback(for: songItem)
                 } label: {
                     HStack {
                         Image(systemName: songItem.isPlaying ? "pause.fill" : "play.fill")
@@ -278,7 +353,7 @@ struct ResultView: View {
         .padding(10)
     }
     
-    // Default artwork placeholder - fixed size
+    // Default artwork placeholder
     private var defaultArtwork: some View {
         ZStack {
             Color.gray.opacity(0.3)
@@ -289,21 +364,9 @@ struct ResultView: View {
         .frame(width: 80, height: 80)
         .clipShape(.rect(cornerRadius: 10))
     }
-    
-    // Copy song info to clipboard
-    func copyToClipboard(_ id: MusicItemID) {
-        if let currentSong = promptController.songItems.first(where: { $0.id == id }) {
-            UIPasteboard.general.string = "\(currentSong.artist) - \(currentSong.title)"
-            self.copyButtonText = "Copied!"
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                self.copyButtonText = "Copy to clipboard"
-            }
-        }
-    }
 }
 
-// Preview
+// Preview (Updated)
 #Preview {
-    ResultView()
+    ResultView(promptController: PromptController())
 }

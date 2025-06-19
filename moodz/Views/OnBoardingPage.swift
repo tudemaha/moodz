@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct OnBoardingView: View {
+    // MARK: - Environment Object (Injected PromptController)
+    @EnvironmentObject var promptController: PromptController
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -29,19 +32,24 @@ struct OnBoardingView: View {
                     
                     Spacer()
                     
-                    NavigationLink(destination: HomePage()) {
-                        Text("Get Started")
-                            .font(.custom("HelveticaNeue", size: 20))
-                            .frame(maxWidth : .infinity)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                            .padding(.vertical, 12)
-                            .background(Color.P) // You can change this to your desired color
-                            .cornerRadius(22)
+                    Button(action: {
+                        // Mark onboarding as completed
+                        UserPreferencesManager.shared.completeOnboarding()
+                    }) {
+                        NavigationLink(destination: HomePage().environmentObject(promptController)) {
+                            Text("Get Started")
+                                .font(.custom("HelveticaNeue", size: 20))
+                                .frame(maxWidth : .infinity)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                                .padding(.vertical, 12)
+                                .background(Color.P)
+                                .cornerRadius(22)
+                        }
                     }
                     .padding(.bottom, 80)
                     .padding(.horizontal, 30)
-                    .buttonStyle(PlainButtonStyle()) // Optional: Keeps button styling intact
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
         }.navigationBarBackButtonHidden(true)
@@ -50,4 +58,5 @@ struct OnBoardingView: View {
 
 #Preview {
     OnBoardingView()
+        .environmentObject(PromptController())
 }
