@@ -1,2 +1,3 @@
-# moodz
-🖼️ Get music recommendations from your picture!
+# 📝 Privacy Policy for Moodz
+
+This branch is to host privacy policy for the Moodz app.
