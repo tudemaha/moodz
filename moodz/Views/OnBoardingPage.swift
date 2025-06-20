@@ -37,14 +37,14 @@ struct OnBoardingView: View {
                         UserPreferencesManager.shared.completeOnboarding()
                     }) {
                         NavigationLink(destination: HomePage().environmentObject(promptController)) {
-                            Text("Get Started")
-                                .font(.custom("HelveticaNeue", size: 20))
-                                .frame(maxWidth : .infinity)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .padding(.vertical, 12)
+                        Text("Get Started")
+                            .font(.custom("HelveticaNeue", size: 20))
+                            .frame(maxWidth : .infinity)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 12)
                                 .background(Color.P)
-                                .cornerRadius(22)
+                            .cornerRadius(22)
                         }
                     }
                     .padding(.bottom, 80)

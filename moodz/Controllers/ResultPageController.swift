@@ -171,7 +171,9 @@ class ResultPageController: ObservableObject {
             // Reset after delay
             copyButtonTimer?.invalidate()
             copyButtonTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: false) { _ in
-                self.copyButtonState = CopyButtonState.default
+                Task { @MainActor in
+                    self.copyButtonState = CopyButtonState.default
+                }
             }
         }
     }
@@ -187,3 +189,4 @@ class ResultPageController: ObservableObject {
         cancellables.removeAll()
     }
 } 
+ 

@@ -23,11 +23,11 @@ struct HomePage: View {
             selection: $pickerItem,
             matching: .images
         )
-        .onChange(of: pickerItem) { newItem in
+        .onChange(of: pickerItem) { oldValue, newValue in
             Task {
-                await controller.handleImageSelection(newItem)
+                await controller.handleImageSelection(newValue)
             }
-        }
+        }        
         .background(
             NavigationLink(
                 destination: PreviewPage(
@@ -41,6 +41,7 @@ struct HomePage: View {
                 EmptyView()
             }
         )
+
         .alert("Error", isPresented: .constant(controller.errorMessage != nil)) {
             Button("OK") {
                 controller.errorMessage = nil
