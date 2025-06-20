@@ -6,13 +6,31 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0A306B392DEAD5D7001721E7 /* JWTDecode in Frameworks */ = {isa = PBXBuildFile; productRef = 0A306B382DEAD5D7001721E7 /* JWTDecode */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
-		9E449EC72DDDB6EE00A4A715 /* moodz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = moodz.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A306ADA2DE6FE3C001721E7 /* moodz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = moodz.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		0A6F20DC2E04A6A700A3514A /* Exceptions for "moodz" folder in "moodz" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Config.xcconfig,
+				Info.plist,
+			);
+			target = 9E449EC62DDDB6EE00A4A715 /* moodz */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9E449EC92DDDB6EE00A4A715 /* moodz */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0A6F20DC2E04A6A700A3514A /* Exceptions for "moodz" folder in "moodz" target */,
+			);
 			path = moodz;
 			sourceTree = "<group>";
 		};
@@ -23,26 +41,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0A306B392DEAD5D7001721E7 /* JWTDecode in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A306B362DEAC616001721E7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		9E449EBE2DDDB6EE00A4A715 = {
 			isa = PBXGroup;
 			children = (
 				9E449EC92DDDB6EE00A4A715 /* moodz */,
-				9E449EC82DDDB6EE00A4A715 /* Products */,
+				0A306ADA2DE6FE3C001721E7 /* moodz.app */,
+				0A306B362DEAC616001721E7 /* Frameworks */,
 			);
-			sourceTree = "<group>";
-		};
-		9E449EC82DDDB6EE00A4A715 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				9E449EC72DDDB6EE00A4A715 /* moodz.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -65,9 +84,10 @@
 			);
 			name = moodz;
 			packageProductDependencies = (
+				0A306B382DEAD5D7001721E7 /* JWTDecode */,
 			);
 			productName = moodz;
-			productReference = 9E449EC72DDDB6EE00A4A715 /* moodz.app */;
+			productReference = 0A306ADA2DE6FE3C001721E7 /* moodz.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -78,7 +98,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					9E449EC62DDDB6EE00A4A715 = {
 						CreatedOnToolsVersion = 16.2;
@@ -94,8 +114,11 @@
 			);
 			mainGroup = 9E449EBE2DDDB6EE00A4A715;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				0A306B372DEAD5D7001721E7 /* XCRemoteSwiftPackageReference "JWTDecode" */,
+			);
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 9E449EC82DDDB6EE00A4A715 /* Products */;
+			productRefGroup = 9E449EBE2DDDB6EE00A4A715;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -127,6 +150,8 @@
 /* Begin XCBuildConfiguration section */
 		9E449ED32DDDB6EF00A4A715 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 9E449EC92DDDB6EE00A4A715 /* moodz */;
+			baseConfigurationReferenceRelativePath = Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -160,6 +185,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = H4V2WUHZB4;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -190,6 +216,8 @@
 		};
 		9E449ED42DDDB6EF00A4A715 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 9E449EC92DDDB6EE00A4A715 /* moodz */;
+			baseConfigurationReferenceRelativePath = Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -223,6 +251,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = H4V2WUHZB4;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -246,6 +275,8 @@
 		};
 		9E449ED62DDDB6EF00A4A715 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 9E449EC92DDDB6EE00A4A715 /* moodz */;
+			baseConfigurationReferenceRelativePath = Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -254,17 +285,21 @@
 				DEVELOPMENT_ASSET_PATHS = "\"moodz/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = moodz/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Moodz;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Preview and save recommended songs to your Apple Music library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Moodz analyzes your photos to recommend music that matches the mood and setting.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.moodz;
+				PRODUCT_BUNDLE_IDENTIFIER = com.andreas.moodz;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -274,6 +309,8 @@
 		};
 		9E449ED72DDDB6EF00A4A715 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 9E449EC92DDDB6EE00A4A715 /* moodz */;
+			baseConfigurationReferenceRelativePath = Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -282,17 +319,21 @@
 				DEVELOPMENT_ASSET_PATHS = "\"moodz/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = moodz/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Moodz;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Preview and save recommended songs to your Apple Music library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Moodz analyzes your photos to recommend music that matches the mood and setting.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.moodz;
+				PRODUCT_BUNDLE_IDENTIFIER = com.andreas.moodz;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -322,6 +363,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		0A306B372DEAD5D7001721E7 /* XCRemoteSwiftPackageReference "JWTDecode" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/auth0/JWTDecode.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0A306B382DEAD5D7001721E7 /* JWTDecode */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0A306B372DEAD5D7001721E7 /* XCRemoteSwiftPackageReference "JWTDecode" */;
+			productName = JWTDecode;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9E449EBF2DDDB6EE00A4A715 /* Project object */;
 }
