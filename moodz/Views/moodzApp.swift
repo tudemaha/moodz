@@ -25,16 +25,16 @@ struct ContentView: View {
     
     var body: some View {
         Group {
-            // Check if onboarding is needed
-            let _ = UserPreferencesManager.shared.resetAllData()
             if UserPreferencesManager.shared.hasCompletedOnboarding {
                 NavigationStack {
                     HomePage()
                         .environmentObject(promptController)
                 }
             } else {
-            OnBoardingView()
+            NavigationStack {
+                OnBoardingView()
                     .environmentObject(promptController)
+                }
             }
         }
         .onAppear {

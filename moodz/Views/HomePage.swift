@@ -13,41 +13,43 @@ struct HomePage: View {
     
     // MARK: - Body
     var body: some View {
-        ZStack {
-            backgroundView
-            mainContent
-        }
-        .navigationBarBackButtonHidden(true)
-        .photosPicker(
-            isPresented: $controller.photoState.isPickerPresented,
-            selection: $pickerItem,
-            matching: .images
-        )
-        .onChange(of: pickerItem) { oldValue, newValue in
-            Task {
-                await controller.handleImageSelection(newValue)
+        NavigationStack {
+            ZStack {
+                backgroundView
+                mainContent
             }
-        }        
-        .background(
-            NavigationLink(
-                destination: PreviewPage(
-                    selectedImage: controller.selectedUIImage,
-                    isHuman: controller.isHuman,
-                    place: controller.place
-                )
-                .environmentObject(promptController),
-                isActive: $controller.isNavigating
-            ) {
-                EmptyView()
+            .navigationBarBackButtonHidden(true)
+            .photosPicker(
+                isPresented: $controller.photoState.isPickerPresented,
+                selection: $pickerItem,
+                matching: .images
+            )
+            .onChange(of: pickerItem) { oldValue, newValue in
+                Task {
+                    await controller.handleImageSelection(newValue)
+                }
             }
-        )
-
-        .alert("Error", isPresented: .constant(controller.errorMessage != nil)) {
-            Button("OK") {
-                controller.errorMessage = nil
+            .navigationDestination(isPresented: $controller.isNavigating) {
+                if let analysisResult = controller.analysisResult {
+                    PreviewPage(
+                        selectedImage: analysisResult.image,
+                        isHuman: analysisResult.isHuman,
+                        place: analysisResult.place
+                    )
+                    .environmentObject(promptController)
+                } else {
+                    // Fallback view (should not happen)
+                    Text("Error: No analysis result")
+                        .foregroundColor(.red)
+                }
             }
-        } message: {
-            Text(controller.errorMessage ?? "")
+            .alert("Error", isPresented: .constant(controller.errorMessage != nil)) {
+                Button("OK") {
+                    controller.errorMessage = nil
+                }
+            } message: {
+                Text(controller.errorMessage ?? "")
+            }
         }
     }
     

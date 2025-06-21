@@ -190,6 +190,18 @@ class PromptController: ObservableObject {
     }
     
     private func searchSongsInAppleMusic() async {
+        // ✅ REQUEST AUTHORIZATION FIRST
+        let authorizationStatus = await MusicAuthorization.request()
+        guard authorizationStatus == .authorized else {
+            print("❌ Apple Music authorization denied or not available")
+            await MainActor.run {
+                errorMessage = "Apple Music access is required to find songs. Please allow access in Settings."
+            }
+            return
+        }
+        
+        print("✅ Apple Music authorization granted")
+        
         var items: [SongItem] = []
         
         for song in songs {
@@ -214,7 +226,7 @@ class PromptController: ObservableObject {
                     items.append(songItem)
                 }
             } catch {
-                // Handle error silently
+                print("❌ Apple Music search failed for \(song.title): \(error)")
             }
         }
         

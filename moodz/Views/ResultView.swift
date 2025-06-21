@@ -152,7 +152,7 @@ struct ResultView: View {
     private var actionButtonsSection: some View {
         VStack {
             Button {
-                if let id = controller.selectedIndex {
+                if let id = controller.selectedIndex ?? controller.songItems.first?.id {
                     controller.copyToClipboard(id)
                 }
             } label: {
@@ -165,10 +165,10 @@ struct ResultView: View {
                     .background(.P)
                     .clipShape(.rect(cornerRadius: 100))
             }
+            .disabled(controller.songItems.isEmpty)
             .padding(.vertical)
             
             VStack(spacing: 12) {
-                // ✅ UPDATED: Generate Other Songs button with limit checking
                 Button {
                     handleGenerateOtherSongs()
                 } label: {
@@ -181,7 +181,7 @@ struct ResultView: View {
                         .background(controller.remainingGenerations > 0 ? .P : .gray)
                         .clipShape(.rect(cornerRadius: 100))
                 }
-                .disabled(controller.selectedIndex == nil)
+                .disabled(controller.remainingGenerations <= 0)
                 .simultaneousGesture(TapGesture().onEnded {
                     controller.stopAllPlayingSongs()
                 })
@@ -275,6 +275,11 @@ struct ResultView: View {
             .scrollTargetBehavior(.viewAligned)
             .scrollPosition(id: $controller.selectedIndex)
             .frame(height: 150)
+            .onAppear {
+                if controller.selectedIndex == nil && !controller.songItems.isEmpty {
+                    controller.selectedIndex = controller.songItems.first?.id
+                }
+            }
         }
     }
     

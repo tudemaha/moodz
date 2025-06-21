@@ -45,18 +45,6 @@ struct PreviewPage: View {
                     
                     VStack{
                         moodSelectionSection(moodLayout: moodLayout)
-                        
-                        NavigationLink(
-                            destination: ResultView(
-                                customPrompt: controller.generatedPrompt,
-                                SelectedImage: controller.imageDisplayInfo?.image,
-                                promptController: promptController
-                            ),
-                            isActive: $controller.navigateToResults
-                        ) {
-                            EmptyView()
-                        }
-                        
                         generateSongsButton
                     }
                 }
@@ -64,79 +52,86 @@ struct PreviewPage: View {
             .padding()
         }
         .navigationBarBackButtonHidden(true)
+        .navigationDestination(isPresented: $controller.navigateToResults) {
+            ResultView(
+                customPrompt: controller.generatedPrompt,
+                SelectedImage: controller.imageDisplayInfo?.image,
+                promptController: promptController
+            )
+        }
     }
     
     // MARK: - View Components
     private var headerSection: some View {
-                HStack(alignment: .top){
-                    NavigationLink(destination: HomePage()) {
-                        Image("back_arrow")
-                            .font(.largeTitle)
-                            .foregroundColor(.white)
-                    }.padding()
-                    Spacer()
-                    
-                    Image("logo_W").resizable()
-                        .scaledToFit()
-                        .frame(width: 120, height: 80)
-                    
-                    Spacer()
-                    
-                    RoundedRectangle(cornerRadius: 25)
-                        .fill(Color.white)
-                        .frame(width : 80, height: 30)
-                        .opacity(0)
-                }.padding(.top, 80)
+        HStack(alignment: .top){
+            NavigationLink(destination: HomePage()) {
+                Image("back_arrow")
+                    .font(.largeTitle)
+                    .foregroundColor(.white)
+            }.padding()
+            Spacer()
+            
+            Image("logo_W").resizable()
+                .scaledToFit()
+                .frame(width: 120, height: 80)
+            
+            Spacer()
+            
+            RoundedRectangle(cornerRadius: 25)
+                .fill(Color.white)
+                .frame(width : 80, height: 30)
+                .opacity(0)
+        }.padding(.top, 80)
     }
     
     private var imageSection: some View {
         Group {
             if let imageInfo = controller.imageDisplayInfo {
                 Image(uiImage: imageInfo.image)
-                                .resizable()
-                                .scaledToFit()
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: imageInfo.size.width, height: imageInfo.size.height)
                     .rotationEffect(Angle(degrees: imageInfo.rotationAngle))
-                        } else {
-                            Text("No image selected")
-                                .foregroundColor(.white)
-                        }
-                    }
-                    }
-                    
+            } else {
+                Text("No image selected")
+                    .foregroundColor(.white)
+            }
+        }
+    }
+    
     private func moodSelectionSection(moodLayout: [GridItem]) -> some View {
-                        VStack(spacing: 10) {
-                            HStack {
-                                Text("Select the vibes of the image: ")
-                                    .font(.custom("HelveticaNeue", size: 18))
-                                    .foregroundStyle(.white)
-                                    .fontWeight(.semibold)
-                                
-                                Spacer()
-                            }
-                            
-                            LazyVGrid(columns: moodLayout) {
+        VStack(spacing: 10) {
+            HStack {
+                Text("Select the vibes of the image: ")
+                    .font(.custom("HelveticaNeue", size: 18))
+                    .foregroundStyle(.white)
+                    .fontWeight(.semibold)
+                
+                Spacer()
+            }
+            
+            LazyVGrid(columns: moodLayout) {
                 ForEach(controller.availableMoods, id: \.self) { mood in
-                                    Button {
+                    Button {
                         controller.selectMood(mood)
-                                    } label: {
-                                        Text(mood)
-                                            .padding(.vertical, 8)
-                                            .padding(.horizontal, 10)
-                                            .containerRelativeFrame(.horizontal) { width, _ in
-                                                width * 0.28
-                                            }
-                            .background(mood == controller.selectedMood ? .P : .white)
-                                            .clipShape(.capsule)
-                                            .font(.custom("HelveticaNeue", size: 16))
-                                            .fontWeight(.semibold)
-                            .foregroundStyle(mood == controller.selectedMood ? .white : .black)
-                                    }
-                                }
+                    } label: {
+                        Text(mood)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 10)
+                            .containerRelativeFrame(.horizontal) { width, _ in
+                                width * 0.28
                             }
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 20)
+                            .background(mood == controller.selectedMood ? .P : .white)
+                            .clipShape(.capsule)
+                            .font(.custom("HelveticaNeue", size: 16))
+                            .fontWeight(.semibold)
+                            .foregroundStyle(mood == controller.selectedMood ? .white : .black)
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 20)
     }
     
     private var generateSongsButton: some View {
@@ -149,23 +144,22 @@ struct PreviewPage: View {
                 Text("Daily generations: \(promptController.remainingGenerations)/\(UserPreferencesManager.shared.dailyGenerationLimit)")
                     .font(.custom("HelveticaNeue", size: 12))
                     .foregroundColor(.white.opacity(0.7))
-                        }
-                        
-                        Button {
+            }
+            
+            Button {
                 handleGenerateButtonTap()
-                        } label: {
-                            Text("Generate Songs")
-                                .font(.custom("HelveticaNeue", size: 16))
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .containerRelativeFrame(.horizontal) { width, _ in
-                                    width * 0.6
-                                }
-                                .padding(12)
+            } label: {
+                Text("Generate Songs")
+                    .font(.custom("HelveticaNeue", size: 16))
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .containerRelativeFrame(.horizontal) { width, _ in
+                        width * 0.6
+                    }
+                    .padding(12)
                     .background(promptController.remainingGenerations > 0 ? Color.P : Color.gray)
-                                .cornerRadius(22)
-                        }
-            // ✅ REMOVED .disabled() - Button is always clickable now
+                    .cornerRadius(22)
+            }
             
             // Show additional info when limit is reached
             if promptController.remainingGenerations <= 0 {
@@ -198,10 +192,11 @@ struct PreviewPage: View {
             showLimitAlert = true
         }
     }
-    
 }
 
 #Preview {
-    PreviewPage(selectedImage: UIImage(systemName: "photo")!, isHuman: "test", place: "test")
-        .environmentObject(PromptController())
+    NavigationStack {
+        PreviewPage(selectedImage: UIImage(systemName: "photo")!, isHuman: "test", place: "test")
+            .environmentObject(PromptController())
+    }
 }

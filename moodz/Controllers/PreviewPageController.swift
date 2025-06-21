@@ -16,16 +16,16 @@ class PreviewPageController: ObservableObject {
     // MARK: - Computed Properties
     var availableMoods: [String] {
         return [
-    "Nostalgic",
-    "Happy",
-    "Sad",
-    "Adventurous",
-    "Dreamy",
-    "Energetic",
-    "Calm",
-    "Romantic",
-    "Urban"
-]
+            "Nostalgic",
+            "Happy",
+            "Sad",
+            "Adventurous",
+            "Dreamy",
+            "Energetic",
+            "Calm",
+            "Romantic",
+            "Urban"
+        ]
     }
     
     var generatedPrompt: String {
@@ -58,6 +58,8 @@ class PreviewPageController: ObservableObject {
         // Process image if available (logic moved from view)
         if let image = selectedImage {
             self.imageDisplayInfo = ImageDisplayInfo(image: image)
+        } else {
+            self.imageDisplayInfo = nil
         }
     }
     
